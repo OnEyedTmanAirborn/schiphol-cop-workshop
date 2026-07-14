@@ -20,7 +20,7 @@ def by_airline(flights: list[Flight], airline: str) -> list[Flight]:
 
 
 def by_city(flights: list[Flight], city: str) -> list[Flight]:
-    return [f for f in flights if f.city == city]
+    return [f for f in flights if city.lower() in f.city.lower()]
 
 
 def apply_filters(

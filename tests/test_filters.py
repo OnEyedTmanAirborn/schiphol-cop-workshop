@@ -47,6 +47,21 @@ def test_by_city_no_match_returns_empty_list(sample_flights):
     assert by_city(sample_flights, "Atlantis (ATL)") == []
 
 
+def test_by_city_case_insensitive_substring_match(sample_flights):
+    """Regression test for OPS-3: city filter should match case-insensitively."""
+    # Lowercase input should match flights with "London (LHR)"
+    matches = by_city(sample_flights, "london")
+    assert {f.number for f in matches} == {"KL1001", "KL1002"}
+    
+    # Partial match with unique substring
+    matches = by_city(sample_flights, "lhr")
+    assert {f.number for f in matches} == {"KL1001", "KL1002"}
+    
+    # Mixed case partial match
+    matches = by_city(sample_flights, "new york")
+    assert {f.number for f in matches} == {"KL0643", "DL0046"}
+
+
 def test_apply_filters_combines_criteria(sample_flights):
     result = apply_filters(
         sample_flights,
