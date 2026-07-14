@@ -9,6 +9,7 @@ from schiphol_ops.models import Direction, Status
 
 _STATUS_CHOICES = [status.value for status in Status]
 _TERMINAL_CHOICES = ["B", "C", "D", "E", "F", "G", "H"]
+_SORT_CHOICES = ["time", "destination", "delay"]
 
 
 def _add_board_arguments(parser: argparse.ArgumentParser, city_flag: str) -> None:
@@ -34,6 +35,12 @@ def _add_board_arguments(parser: argparse.ArgumentParser, city_flag: str) -> Non
         dest="city",
         metavar="CITY",
         help=f"only flights matching this {city_flag}",
+    )
+    parser.add_argument(
+        "--sort",
+        choices=_SORT_CHOICES,
+        default="time",
+        help="order board by time, destination, or delay",
     )
 
 
@@ -84,6 +91,7 @@ def _board_command(args: argparse.Namespace, direction: Direction) -> int:
         status=Status(args.status) if args.status else None,
         airline=args.airline,
         city=args.city,
+        sort_by=args.sort,
     )
     print(board.render_board(flights, direction))
     return 0
