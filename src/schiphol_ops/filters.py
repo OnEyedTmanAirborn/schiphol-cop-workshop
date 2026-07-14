@@ -23,6 +23,23 @@ def by_city(flights: list[Flight], city: str) -> list[Flight]:
     return [f for f in flights if city.lower() in f.city.lower()]
 
 
+def by_time(flights: list[Flight]) -> list[Flight]:
+    return sorted(flights, key=lambda f: (f.scheduled, f.number))
+
+
+def by_destination(flights: list[Flight]) -> list[Flight]:
+    return sorted(flights, key=lambda f: (f.city.lower(), f.scheduled, f.number))
+
+
+def by_delay(flights: list[Flight]) -> list[Flight]:
+    return sorted(
+        flights,
+        key=lambda f: (0, -f.delay_minutes, f.scheduled, f.number)
+        if f.is_delayed
+        else (1, f.scheduled, f.number),
+    )
+
+
 def apply_filters(
     flights: list[Flight],
     *,
@@ -31,6 +48,7 @@ def apply_filters(
     status: Status | None = None,
     airline: str | None = None,
     city: str | None = None,
+    sort_by: str | None = None,
 ) -> list[Flight]:
     result = flights
     if direction is not None:
@@ -43,6 +61,12 @@ def apply_filters(
         result = by_airline(result, airline)
     if city is not None:
         result = by_city(result, city)
+    if sort_by == "time":
+        result = by_time(result)
+    elif sort_by == "destination":
+        result = by_destination(result)
+    elif sort_by == "delay":
+        result = by_delay(result)
     return result
 
 
