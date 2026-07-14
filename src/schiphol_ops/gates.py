@@ -62,9 +62,10 @@ def find_conflicts(flights: list[Flight]) -> list[Conflict]:
     """Flag flights whose occupancy windows overlap at the same gate."""
     conflicts: list[Conflict] = []
     for gate, slots in sorted(occupancies_by_gate(flights).items()):
-        for current, following in zip(slots, slots[1:]):
-            if _overlaps(current, following):
-                conflicts.append(Conflict(gate=gate, first=current, second=following))
+        for i in range(len(slots)):
+            for j in range(i + 1, len(slots)):
+                if _overlaps(slots[i], slots[j]):
+                    conflicts.append(Conflict(gate=gate, first=slots[i], second=slots[j]))
     return conflicts
 
 
