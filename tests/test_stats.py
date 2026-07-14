@@ -46,6 +46,26 @@ def test_on_time_count_excludes_delayed():
     assert summary.on_time_pct == 67
 
 
+def test_summarize_with_mixed_statuses():
+    """Regression test for issue #2: cancelled flights counted as on-time and avg delay computed over all flights."""
+    flights = [
+        make_flight(number="KL0001", status=Status.ON_TIME),
+        make_flight(number="KL0002", status=Status.BOARDING),
+        make_flight(number="KL0003", delay_minutes=30, status=Status.DELAYED),
+        make_flight(number="KL0004", delay_minutes=50, status=Status.DELAYED),
+        make_flight(number="KL0005", status=Status.CANCELLED),
+    ]
+    summary = summarize(flights)
+    # Buckets should add up to total
+    assert summary.total == 5
+    assert summary.on_time == 2  # excludes cancelled
+    assert summary.delayed == 2
+    assert summary.cancelled == 1
+    assert summary.on_time + summary.delayed + summary.cancelled == summary.total
+    # Average delay should be computed over delayed flights only: (30+50)/2 = 40
+    assert summary.avg_delay == 40
+
+
 def test_summarize_empty_list():
     summary = summarize([])
     assert summary.total == 0
